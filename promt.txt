@@ -1,0 +1,200 @@
+BALANCE-SARF — MASTER BUILD PROMPT
+
+IMPORTANT: Build the REAL production BALANCE-SARF (بالانس-صرف) customer app, customer web app, and admin dashboard.
+
+THE REFERENCE IMAGES ARE THE PRIMARY VISUAL SOURCE OF TRUTH.
+Open and inspect EVERY image inside the App Design and Admin Design folders. Recreate each screen as literally and consistently as practical: layout, spacing, cards, navigation, icons, typography hierarchy, dark navy background, purple/indigo/blue/cyan neon accents, rounded/glass cards, charts, tables, buttons, status styles, and overall visual hierarchy. Do NOT treat the images as loose inspiration and do NOT replace them with a generic fintech template. Each reference screen is a separate real page/screen, not one combined page.
+
+PRODUCT:
+BALANCE-SARF / بالانس-صرف is a real balance-exchange service for supported Iraqi payment wallets/providers. The first operational version uses MANUAL transfers: the customer submits a request and transfer receipt; an authorized admin verifies it and manually sends the requested balance. Do not build fake/test-only functionality. Build production-quality, database-backed workflows, while keeping the architecture ready for official wallet APIs in the future.
+
+THREE PARTS:
+1) Customer mobile app for iOS/Android.
+2) Responsive customer web app.
+3) Desktop-first admin web dashboard.
+All share the same secure backend/database.
+
+FIRST LAUNCH:
+Splash/loading screen → first-time language selection → welcome screen → login/register.
+Language choices:
+- Kurdish + Kurdistan flag
+- Arabic + Iraq flag
+- English + US flag
+Every user-facing string must be localization-ready. The user can change language later from Settings. Support correct RTL for Kurdish/Arabic and LTR for English.
+
+AUTHENTICATION — NO OTP:
+- Phone + password
+- Email + password
+- Sign in with Apple
+- Sign in with Google
+After first registration/social login, collect name and required profile information.
+
+CUSTOMER APP:
+Implement the reference screens for onboarding, login, registration, profile setup, home, wallet selection, exchange, receipt upload, request confirmation, request details, request history, notifications, support, profile and settings.
+
+EXCHANGE FLOW:
+1. Select the wallet/provider to RECEIVE balance.
+2. Select the wallet/provider to SEND balance.
+3. Enter amount.
+4. Show calculated fee and final net amount.
+5. Show the configured account/phone number and instructions for sending the balance.
+6. User makes the transfer manually.
+7. User uploads receipt/screenshot.
+8. User enters recipient name and receiving phone number and confirms destination wallet.
+9. Show full review.
+10. Confirm and create a unique request number.
+Fees and final amounts MUST be calculated securely on the backend, not trusted from the client.
+
+REQUEST STATUSES:
+Pending, Under Review, Approved, Balance Sending, Sent, Completed, Rejected, Cancelled by User, Refunded/Return Money, and Expired if needed.
+
+USER CANCELLATION:
+The user can cancel their own request BEFORE admin approval.
+This MUST be different from an admin rejection.
+Admin must clearly see “Cancelled by User” versus “Rejected by Admin”.
+Keep complete status history: previous status, new status, actor, timestamp, and reason where applicable.
+
+ADMIN REQUEST PROCESS:
+Admin opens the full request details before acting. Show request number, user, source/destination wallet, amount, fee, net amount, sender number, recipient name/number, receipt, timestamps, status history, suspicious flags, notes and transaction information.
+Verification checklist:
+- receipt valid
+- sender number verified
+- source wallet verified
+- amount verified
+- destination number verified
+- user verified
+- destination wallet verified
+Admin actions: approve, reject with reason, add note, mark balance sent, upload outgoing transfer receipt, complete, refund/return where applicable.
+Every important admin action must be audited.
+
+WALLETS/PROVIDERS:
+Initial providers:
+Super Qi, FIB / First Iraqi Bank, FastPay, NEO, ZainCash, Asiapay, NASSPAY, NassWallet, Tabadul.
+Admin can add/edit/enable/disable providers, upload a logo/image, set an image URL, and replace the image later.
+Separate PROVIDERS from WALLET ACCOUNTS. A provider can have multiple operational accounts.
+Wallet account fields can include provider, phone/account number, owner name, available balance, enabled status, notes and last updated.
+Admin can change configured numbers later, such as the FastPay receiving number, without rebuilding the app.
+
+EXCHANGE PAIRS & FEES:
+Admin controls exchange pairs such as FastPay→FIB, FIB→FastPay, ZainCash→FastPay, etc.
+Each pair can be enabled/disabled.
+Fee rules support percentage, fixed fee, percentage + fixed, minimum/maximum fee, minimum/maximum transaction amount.
+Backend is authoritative for calculations.
+
+FINANCIAL SAFETY:
+Use integer monetary values (BIGINT/integer-safe representation) for IQD; avoid floating-point money calculations.
+Maintain a ledger for every financial movement: incoming, outgoing, exchange, fee, refund, manual adjustment and other movements.
+Do not silently mutate balances without a ledger entry.
+Financial operations should be transactional and protected against double processing/idempotency issues.
+
+ADMIN SECTIONS:
+Dashboard
+Orders/Requests
+Order Details
+Users
+Wallets/Providers
+Wallet Accounts
+Exchange Pairs
+Fees/Commissions
+Transactions
+Ledger
+Analytics/Statistics
+Notifications
+Support/Tickets
+Banners/Sliders
+Referrals
+Suspicious Requests/Flags
+Reports
+System Logs/Audit Logs
+Settings
+Admin Profile
+Roles & Permissions
+Maintenance/System Status
+
+ADMIN ANALYTICS:
+Show comprehensive statistics:
+- total requests
+- requests today
+- pending
+- completed
+- rejected
+- cancelled by users
+- refunded/returned
+- daily new users
+- exchanged volume
+- total commission
+- daily profit/revenue
+- monthly profit/revenue
+- most-used SEND wallet/provider
+- most-used RECEIVE wallet/provider
+- most-used exchange pair
+- volume and count per wallet/provider
+- status distribution
+- trends and comparisons
+Date filters: today, yesterday, last 7 days, last 30 days, this month, previous month, custom range.
+Use charts/tables consistent with Admin Design references.
+
+ADMIN ROLES:
+- Super Admin: full access
+- Manager: requests/users
+- Finance: balances/ledger/transactions/financial reports
+- Support: requests/support
+Permissions must be enforced server-side.
+
+NOTIFICATIONS:
+Customer notifications for submitted, under review, approved, rejected with reason, balance sent, completed, refunded, announcements and promotions. Support in-app and push notifications; architecture can support future official SMS/WhatsApp integrations.
+
+SUPPORT:
+Support center, FAQ, tickets, ticket linked to request, customer/admin messages, ticket status, appropriate attachments.
+
+SECURITY:
+Recommended production stack:
+- Supabase PostgreSQL
+- Supabase Auth
+- Supabase Storage
+- Supabase Realtime where useful
+- secure Edge Functions/server functions
+Use RLS, admin RBAC, private receipt storage, signed URLs, user data isolation, server-side validation/calculation, rate limiting, idempotency, audit logs and secure environment secrets.
+Never expose private receipts publicly.
+
+SUSPICIOUS ACTIVITY:
+Flag possible duplicate receipts, repeated identical amounts, rapid repeated attempts, unusual recipients or unusual account behavior for manual review. A flag does not automatically reject unless configured by an explicit business rule.
+
+DATA MODEL:
+Use relational entities such as profiles, admins, roles, permissions, providers, wallet_accounts, exchange_pairs, fee_rules, exchange_requests, request_status_history, request_receipts, transactions, ledger_entries, notifications, support_tickets, support_messages, audit_logs, app_settings, banners, referrals, suspicious_flags and optional saved_recipients. Use foreign keys, constraints and indexes.
+
+SETTINGS:
+Admin can control providers, wallet accounts/numbers, provider images, exchange pairs, fees, transaction limits, business/contact information, support, notifications, banners, maintenance mode and supported languages. Ordinary configuration changes must not require a mobile app update.
+
+BANNERS:
+Admin can add/edit/delete/disable banners, upload images, set title/description/action/order/status, and maintain language-specific versions.
+
+UI/UX:
+Use the supplied images as the visual authority. Keep the premium dark fintech style: dark navy/black base, purple/indigo/blue/cyan neon accents, rounded glass-like cards, subtle glow/gradients, clear hierarchy, polished icons, readable typography and consistent spacing. Do not introduce an unrelated design system.
+
+RESPONSIVENESS:
+Customer web: mobile/tablet/desktop.
+Admin: desktop-first and tablet-friendly.
+Mobile: iOS/Android.
+
+QUALITY:
+Implement loading, empty, error, retry and offline/network-failure states; validation; upload progress; safe navigation; duplicate-submit protection; and financially safe data updates.
+Do not build only a static frontend prototype. Authentication, profiles, requests, statuses, receipts, fees, providers, wallet accounts, admin actions, ledger, notifications, analytics, support and audit logs must be connected to the real backend.
+
+FINAL VISUAL RULE:
+For EVERY image in App Design and Admin Design:
+1. Open it.
+2. Identify its exact screen/page.
+3. Recreate it.
+4. Preserve its visual hierarchy and structure.
+5. Connect it to real application logic.
+6. Make controls functional.
+7. Keep navigation consistent with all other reference images.
+
+If generic conventions conflict with a supplied reference image, follow the supplied image for visual appearance. Do not combine separate reference screens into one page.
+
+BRAND:
+Use the supplied BALANCE-SARF logo and app icon from the BRAND folder. Do not replace them with a generic logo.
+
+FINAL GOAL:
+Deliver one complete, professional, production-quality balance-exchange platform with a customer app, customer web app and full admin system. The reference images are not optional inspiration: they are the design specification and must be followed as literally and consistently as practical while implementing the underlying functionality securely and correctly.
